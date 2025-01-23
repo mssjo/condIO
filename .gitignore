@@ -1,2 +1,3 @@
 build/*
 condIO.egg-info/*
+condIO/__pycache__/*

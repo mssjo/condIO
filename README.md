@@ -23,7 +23,8 @@ This program prints "Hello, world!" in different languages into corresponding fi
 If a file `names.txt` is present, the program says hello to them as well.
 
 ```python
-import condIO
+import sys
+from condIO import CondIO
 
 languages = set(sys.argv[1:])
 
