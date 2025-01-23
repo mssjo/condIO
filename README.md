@@ -13,7 +13,7 @@ This is a python package, so just use `pip --install` on the directory containin
 Importantly, only those for which `enable == True` are actually opened, which provides a more convenient alternative to conditionals with `contextlib.nullcontext`.
 Inside the context,  one can perform read/write operations to all the files, but only the operations done on enabled files will actually happen, removing the need for clumsy conditionals in the potentially complicated code.
 
-Inside `with CondIO().add(...)...add(...) as io`, each file is accessed via `io['alias']` (where `alias` is the file's path if nothing else is specified); such an expression is still valid even if the file is not enabled, but `os.devnull` is returned instead of the actual file, so it will appear empty when reading and silently discard all writes.
+Inside `with CondIO().add(...)...add(...) as io`, each file is accessed via `io['alias']` (where `alias` is the file's path if nothing else is specified); such an expression is still valid even if the file is not enabled, but in that case `os.devnull` is returned instead of the actual file, so it will appear empty when reading and silently discard all writes.
 One can also use `io.print(string, alias)`, which will print `string` to the file if it is enabled.
 If `alias` is omitted, printing is done to `sys.stdout` if `enable_std==True` is set when creating the `CondIO` object (which is the default), and not at all otherwise.
 
