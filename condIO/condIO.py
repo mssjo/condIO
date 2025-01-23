@@ -5,13 +5,7 @@ class CondIO:
     """
     Context manager that contains a number of conditionally enabled input/output files.
 
-    Files can be added using add (see its documentation) and thereafter accessed with
-    as if this object was a dict of files.
-    They are all opened and closed when this manager is entered and exited.
-
-    Files that are added but not enabled are not opened, and attempting to access one
-    will return an empty iterable.
-    This class also provides a print function that only performs the print operation if the target file is active (see its documentation).
+    See README.md
     """
 
     class _io:
@@ -23,7 +17,7 @@ class CondIO:
 
     def __init__(self, enable_std=True, ios=[]):
         """
-        Create a multiplexer.
+        Create a conditional IO context manager.
 
         Arguments:
         enable_std -- if True, the multiplexer will print to stdout when no other file is specified.
@@ -36,10 +30,10 @@ class CondIO:
 
     def add(self, enable, path, mode='r', alias=None):
         """
-        Add a file to the multiplexer.
+        Add a file to the manager.
 
         Arguments:
-        enable -- the file is only open and operated on if this is True
+        enable -- the file is only opened and operated on if this is True
         path -- the path to the file
         mode -- the file is opened with open(path, mode) (defaults to 'r')
         alias -- the file is accessed with self[alias] (defaults to path)
@@ -59,21 +53,27 @@ class CondIO:
         return self.add(not os.path.isfile(path), path, mode, alias)
 
 
-    def print(self, string, where=None):
+    def is_enabled(self, key):
+        """ Check if file 'key' is enabled for I/O."""
+        if key not in self._ios:
+            raise KeyError(f"No conditional input/output called '{key}'")
+        return self._ios[key]._enabled
+
+    def print(self, string, key=None):
         """
         Print to a stream if it is enabled.
 
         Arguments:
         string -- the string to be printed
-        where -- the name/alias of a file; if omitted, printing is done to stdout
+        key -- the name/alias of a file; if omitted, printing is done to stdout
         """
-        if where is None:
+        if key is None:
             if self._enable_std:
                 print(string)
-        elif where not in self._ios:
-            raise KeyError(f"No multiplexed input/output called '{where}'")
-        elif self._ios[where]._enabled:
-            print(string, file=self._ios[where]._file)
+        elif key not in self._ios:
+            raise KeyError(f"No conditional input/output called '{key}'")
+        elif self._ios[key]._enabled:
+            print(string, file=self._ios[key]._file)
 
     def __enter__(self):
         for io in self._ios.values():
@@ -87,7 +87,7 @@ class CondIO:
 
     def __getitem__(self, key):
         if key not in self._ios:
-            raise KeyError(f"No multiplexed input/output called '{key}'")
+            raise KeyError(f"No conditional input/output called '{key}'")
         return self._ios[key]._file
 
 import sys,os.path
