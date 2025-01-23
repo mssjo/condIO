@@ -5,7 +5,7 @@ By Mattias Sjö, 2025
 
 ## Installation
 
-This is a python package, so just use `pip --install` on the directory containing `setup.py`.
+This is a python package, so just use `pip install` on the directory containing `setup.py`.
 
 ## Usage
 
