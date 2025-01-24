@@ -59,21 +59,29 @@ class CondIO:
             raise KeyError(f"No conditional input/output called '{key}'")
         return self._ios[key]._enabled
 
-    def print(self, string, key=None):
+    def print(self, string, *keys):
         """
-        Print to a stream if it is enabled.
+        Print to one or more streams, skipping disabled ones.
 
         Arguments:
         string -- the string to be printed
-        key -- the name/alias of a file; if omitted, printing is done to stdout
+        keys -- any number names/aliases of files, which are printed to if enabled.
+            The key None causes printing to stdout.
+            If no keys are given, a single None is used as default.
         """
-        if key is None:
+
+        if not keys:
             if self._enable_std:
                 print(string)
-        elif key not in self._ios:
-            raise KeyError(f"No conditional input/output called '{key}'")
-        elif self._ios[key]._enabled:
-            print(string, file=self._ios[key]._file)
+        else:
+            for key in keys:
+                if key is None:
+                    if self._enable_std:
+                        print(string)
+                elif key not in self._ios:
+                    raise KeyError(f"No conditional input/output called '{key}'")
+                elif self._ios[key]._enabled:
+                    print(string, file=self._ios[key]._file)
 
     def __enter__(self):
         for io in self._ios.values():
